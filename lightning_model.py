@@ -17,7 +17,7 @@ class GraphPredLightning(BaseTemplate):
         )
         if not self._printed_sample and score is not None:
             labels = batch.bin_labels[batch.true_nodes_mask]
-            preds = score.view(-1)[batch.true_nodes_mask]
+            preds = score.view(-1)
             n = min(5, len(labels))
             print("\n--- Sample predictions (first batch) ---")
             print(f"{'idx':>4}  {'score':>8}  {'label':>6}")
