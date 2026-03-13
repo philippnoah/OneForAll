@@ -194,7 +194,7 @@ def main(params):
         metrics,
         params.num_epochs,
         strategy=strategy,
-        save_model=False,
+        save_model=True,
         load_best=params.load_best,
         reload_freq=1,
         test_rep=params.test_rep,
