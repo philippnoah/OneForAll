@@ -110,7 +110,7 @@ class BaseTemplate(LightningModule):
             self.log(
                 osp.join(self.name, step_name, "loss"),
                 loss,
-                on_step=False,
+                on_step=True,
                 on_epoch=True,
                 prog_bar=log_loss,
                 batch_size=batch.batch_size
