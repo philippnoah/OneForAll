@@ -57,7 +57,7 @@ midterm_retweet_node: &midterm_retweet_node
   dataset_name: midterm_retweet
   dataset_splitter: MidtermSplitter
   process_label_func: process_int_label
-  num_classes: 50
+  num_classes: 51
 
 link-eval-args: &link-eval-args
   remove_edge: False
