@@ -14,7 +14,7 @@ class MidtermRetweetDataset(OFAPygDataset):
     """
     Node classification on the midterm Twitter retweet graph.
 
-    Node features: pre-computed 86-dim tabular + text-PCA features (from generate_graph_retweet.py).
+    Node features: pre-computed 98-dim tabular + text-PCA features (from generate_graph_retweet.py).
     Labels: US state (50 classes, -1 for unlabeled nodes).
 
     All feature types (node, edge, noi, class, prompt) use the same 86-dim space so no
