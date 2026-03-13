@@ -30,6 +30,10 @@ midterm_retweet_node:
   <<: *E2E-node
   dataset: midterm_retweet_node
 
+midterm_retweet_pseudo_node:
+  <<: *E2E-node
+  dataset: midterm_retweet_pseudo_node
+
 logic_arxiv:
   <<: *E2E-node
   dataset: logic_arxiv

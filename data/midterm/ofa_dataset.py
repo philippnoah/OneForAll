@@ -6,51 +6,51 @@ import torch_geometric as pyg
 
 from data.ofa_data import OFAPygDataset, pth_safe_load, safe_mkdir
 
-# TODO: update this path once graph_retweet/graph_data.pt is in its final location
-GRAPH_PATH = "/home1/eibl/gfm/OneForAll/data/midterm/graph_retweet/graph_data.pt"
-
 
 class MidtermRetweetDataset(OFAPygDataset):
     """
     Node classification on the midterm Twitter retweet graph.
 
-    Node features: pre-computed 98-dim tabular + text-PCA features (from generate_graph_retweet.py).
-    Labels: US state (50 classes, -1 for unlabeled nodes).
-
-    All feature types (node, edge, noi, class, prompt) use the same 86-dim space so no
-    LLM encoder is needed. Class node embeddings are per-state mean feature vectors.
+    Node features: pre-computed 98-dim tabular + text-PCA features.
+    Subclasses set GRAPH_PATH to point to the desired graph_data.pt file.
     """
+
+    GRAPH_PATH = "/home1/eibl/gfm/OneForAll/data/midterm/graph_retweet/graph_data.pt"
 
     def __init__(self, name, load_texts=False, encoder=None, root="./cache_data",
                  transform=None, pre_transform=None):
-        # Force load_texts=True so OFAPygDataset skips the encoder and calls add_raw_texts.
-        # The encoder argument is accepted but never used.
         super().__init__(name, load_texts=True, encoder=encoder, root=root,
                          transform=transform, pre_transform=pre_transform)
 
     # ── data generation ───────────────────────────────────────────────────────
 
     def gen_data(self):
-        raw = torch.load(GRAPH_PATH, map_location="cpu")
+        raw = torch.load(self.GRAPH_PATH, map_location="cpu")
         x = raw["x"].numpy().astype(np.float32)   # [N, D]
         y = raw["y"]                                # [N] long, -1 = unlabeled
         edge_index = raw["edge_index"]              # [2, E]
-        label_names = raw["label_names"]            # list of 50 state strings
-        num_classes = len(label_names)
         D = x.shape[1]
+
+        # Normalise label_names to a list indexed by class index (0..C-1),
+        # handling both list and dict formats.
+        raw_label_names = raw["label_names"]
+        if isinstance(raw_label_names, dict):
+            num_classes = max(k for k in raw_label_names if k >= 0) + 1
+            label_names = [raw_label_names.get(i, str(i)) for i in range(num_classes)]
+        else:
+            label_names = list(raw_label_names)
+            num_classes = len(label_names)
 
         data = pyg.data.Data(edge_index=edge_index, y=y, num_nodes=x.shape[0])
         data.label_names = label_names
 
-        # Class node embeddings: mean feature vector of labeled nodes per state.
-        # Falls back to zeros for states with no labeled nodes.
+        # Class node embeddings: mean feature vector of labeled nodes per class.
         class_feats = np.zeros((num_classes, D), dtype=np.float32)
         for c in range(num_classes):
             mask = (y == c).numpy()
             if mask.sum() > 0:
                 class_feats[c] = x[mask].mean(axis=0)
 
-        # All non-node feature types are zero vectors of the same dimension.
         edge_feat = np.zeros((1, D), dtype=np.float32)
         noi_feat = np.zeros((1, D), dtype=np.float32)
         prompt_feat = np.zeros((3, D), dtype=np.float32)
@@ -63,7 +63,6 @@ class MidtermRetweetDataset(OFAPygDataset):
             }
         }
 
-        # texts[i] are passed directly to add_raw_texts (no LLM encoding happens)
         texts = [x, edge_feat, noi_feat, class_feats, prompt_feat]
         return [data], texts, task_map
 
@@ -78,7 +77,6 @@ class MidtermRetweetDataset(OFAPygDataset):
         return self.collate(data_list)
 
     def add_text_emb(self, data_list, texts_emb):
-        # Not used (load_texts is always True), but required by the abstract base class.
         return self.add_raw_texts(data_list, texts_emb)
 
     # ── task interface ────────────────────────────────────────────────────────
@@ -92,3 +90,9 @@ class MidtermRetweetDataset(OFAPygDataset):
         if mode == "lr_node":
             return {"f2n": [1, [0]], "n2f": [3, [0]]}
         return {"f2n": [1, [0]], "n2f": [3, [0]], "n2c": [2, [0]], "c2n": [4, [0]]}
+
+
+class MidtermRetweetPseudoDataset(MidtermRetweetDataset):
+    """Same graph, hashtag-based political orientation pseudo labels (rep=0, dem=1)."""
+
+    GRAPH_PATH = "/home1/eibl/gfm/OneForAll/data/midterm/graph_retweet/graph_data_pseudo.pt"
