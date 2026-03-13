@@ -15,7 +15,8 @@ from gp.nn.models.GNN import MultiLayerMessagePassing
 from gp.nn.models.util_model import MLP
 from gp.utils.utils import load_pretrained_state
 
-LLM_DIM_DICT = {"ST": 768, "BERT": 768, "e5": 1024, "llama2_7b": 4096, "llama2_13b": 5120}
+LLM_DIM_DICT = {"ST": 768, "BERT": 768, "e5": 1024, "llama2_7b": 4096, "llama2_13b": 5120,
+                "precomputed": 86}
 
 
 class TextClassModel(torch.nn.Module):

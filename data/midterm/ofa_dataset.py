@@ -7,7 +7,7 @@ import torch_geometric as pyg
 from data.ofa_data import OFAPygDataset, pth_safe_load, safe_mkdir
 
 # TODO: update this path once graph_retweet/graph_data.pt is in its final location
-GRAPH_PATH = "PLACEHOLDER/graph_retweet/graph_data.pt"
+GRAPH_PATH = "/home1/eibl/gfm/OneForAll/data/midterm/graph_retweet/graph_data.pt"
 
 
 class MidtermRetweetDataset(OFAPygDataset):

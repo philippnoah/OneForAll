@@ -16,8 +16,11 @@ class SentenceEncoder:
         self.device, _ = get_available_devices()
         self.batch_size = batch_size
         self.multi_gpu = multi_gpu
-        self.model = LLMModel(llm_name, quantization=False, peft=False, cache_dir=cache_dir)
-        self.model.to(self.device)
+        if llm_name == "precomputed":
+            self.model = None  # no LLM needed; features are pre-computed
+        else:
+            self.model = LLMModel(llm_name, quantization=False, peft=False, cache_dir=cache_dir)
+            self.model.to(self.device)
 
     def encode(self, texts, to_tensor=True):
         all_embeddings = []
