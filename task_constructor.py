@@ -9,6 +9,7 @@ import utils
 from data.KG.gen_data import KGOFADataset
 from data.chemmol.gen_data import MolOFADataset
 from data.midterm.ofa_dataset import MidtermRetweetDataset, MidtermRetweetPseudoDataset
+from data.instagram.ofa_dataset import InstagramMentionDataset, InstagramMentionLanguageDataset
 from data.single_graph.gen_data import SingleGraphOFADataset
 from fs_datamanager import SimpleFSManager
 from gp.lightning.data_template import DataWithMeta
@@ -25,7 +26,9 @@ name2dataset = {"arxiv": SingleGraphOFADataset, "Cora": SingleGraphOFADataset, "
                 "WN18RR": KGOFADataset, "FB15K237": KGOFADataset, "wikics": SingleGraphOFADataset,
                 "chemblpre": MolOFADataset, "chempcba": MolOFADataset, "chemhiv": MolOFADataset,
                 "midterm_retweet": MidtermRetweetDataset,
-                "midterm_retweet_pseudo": MidtermRetweetPseudoDataset, }
+                "midterm_retweet_pseudo": MidtermRetweetPseudoDataset,
+                "instagram_mention": InstagramMentionDataset,
+                "instagram_mention_language": InstagramMentionLanguageDataset, }
 
 
 ########################################################################

@@ -34,6 +34,14 @@ midterm_retweet_pseudo_node:
   <<: *E2E-node
   dataset: midterm_retweet_pseudo_node
 
+instagram_mention_node:
+  <<: *E2E-node
+  dataset: instagram_mention_node
+
+instagram_mention_language_node:
+  <<: *E2E-node
+  dataset: instagram_mention_language_node
+
 logic_arxiv:
   <<: *E2E-node
   dataset: logic_arxiv

@@ -52,6 +52,20 @@ wikics: &wikics
   process_label_func: process_pth_label
   num_classes: 10
 
+instagram_mention_node: &instagram_mention_node
+  <<: *E2E-node
+  dataset_name: instagram_mention
+  dataset_splitter: MidtermSplitter
+  process_label_func: process_int_label
+  num_classes: 3
+
+instagram_mention_language_node: &instagram_mention_language_node
+  <<: *E2E-node
+  dataset_name: instagram_mention_language
+  dataset_splitter: MidtermSplitter
+  process_label_func: process_int_label
+  num_classes: 3
+
 midterm_retweet_pseudo_node: &midterm_retweet_pseudo_node
   <<: *E2E-node
   dataset_name: midterm_retweet_pseudo
