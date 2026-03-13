@@ -9,9 +9,9 @@
 #SBATCH --time=08:00:00
 
 source $(conda info --base)/etc/profile.d/conda.sh
-conda activate prodigy
+conda activate ofa
 
-cd "$(dirname "$0")/.."
+cd "$SLURM_SUBMIT_DIR"
 
 mkdir -p logs
 
