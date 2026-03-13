@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=12
 #SBATCH --mem=64G
-#SBATCH --time=08:00:00
+#SBATCH --time=01:00:00
 
 source $(conda info --base)/etc/profile.d/conda.sh
 conda activate ofa
@@ -28,3 +28,4 @@ python run_cdm.py \
     num_workers=8 \
     exp_name=midterm_retweet \
     offline_log=True
+    
