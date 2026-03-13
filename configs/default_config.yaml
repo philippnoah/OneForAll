@@ -10,7 +10,7 @@ batch_size: 128
 num_workers: 4
 seed: 1
 data_path:
-offline_log: True
+offline_log: False
 exp_name: ""
 train_sample_size: -1
 eval_sample_size: -1
