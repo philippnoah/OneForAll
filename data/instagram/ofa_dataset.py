@@ -75,3 +75,11 @@ class InstagramMentionDataset(OFAPygDataset):
 
 class InstagramMentionLanguageDataset(InstagramMentionDataset):
     GRAPH_PATH = "/home1/eibl/gfm/prodigy/data/graphs/ukr_ru/instagram/mention_graph_language_minilm.pt"
+
+
+class TwitterRetweetRepdemDataset(InstagramMentionDataset):
+    """
+    Node classification on the Twitter retweet graph with rep/dem pseudo labels.
+    Same feature format as Instagram (393-dim: 9 stats + 384 MiniLM).
+    """
+    GRAPH_PATH = "/home1/eibl/gfm/prodigy/data/graphs/midterm/retweet_graph_repdem_minilm.pt"

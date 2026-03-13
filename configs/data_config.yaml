@@ -66,6 +66,13 @@ instagram_mention_language_node: &instagram_mention_language_node
   process_label_func: process_int_label
   num_classes: 3
 
+twitter_retweet_repdem_node: &twitter_retweet_repdem_node
+  <<: *E2E-node
+  dataset_name: twitter_retweet_repdem
+  dataset_splitter: MidtermSplitter
+  process_label_func: process_int_label
+  num_classes: 2
+
 midterm_retweet_pseudo_node: &midterm_retweet_pseudo_node
   <<: *E2E-node
   dataset_name: midterm_retweet_pseudo

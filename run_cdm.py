@@ -13,7 +13,7 @@ from gp.lightning.metric import (
     EvalKit,
 )
 from gp.lightning.module_template import ExpConfig
-from gp.lightning.training import lightning_fit
+from gp.lightning.training import lightning_fit, lightning_test
 from gp.utils.utils import (
     load_yaml,
     combine_dict,
@@ -72,7 +72,7 @@ def main(params):
         encoder.flush_model()
 
     """
-    2. Load model 
+    2. Load model
     """
     out_dim = params.emb_dim + (params.rwpe if params.rwpe is not None else 0)
 
@@ -88,6 +88,19 @@ def main(params):
     bin_model = BinGraphAttModel if params.JK == "none" else BinGraphModel
     model = bin_model(model=gnn, llm_name=params.llm_name, outdim=out_dim, task_dim=1,
                       add_rwpe=params.rwpe, dropout=params.dropout)
+
+    if hasattr(params, "load_checkpoint") and params.load_checkpoint:
+        ckpt = torch.load(params.load_checkpoint, map_location="cpu")
+        state_dict = ckpt.get("state_dict", ckpt)
+        # strip Lightning "model." prefix if present
+        state_dict = {k.replace("model.", "", 1) if k.startswith("model.") else k: v
+                      for k, v in state_dict.items()}
+        missing, unexpected = model.load_state_dict(state_dict, strict=False)
+        print(f"Loaded checkpoint: {params.load_checkpoint}")
+        if missing:
+            print(f"  Missing keys:    {missing}")
+        if unexpected:
+            print(f"  Unexpected keys: {unexpected}")
 
     """
     3. Construct datasets and lightning datamodule.
@@ -187,19 +200,33 @@ def main(params):
 
 
     strategy = "deepspeed_stage_2" if gpu_size > 1 else "auto"
-    val_res, test_res = lightning_fit(
-        wandb_logger,
-        pred_model,
-        params.datamodule,
-        metrics,
-        params.num_epochs,
-        strategy=strategy,
-        save_model=True,
-        load_best=params.load_best,
-        reload_freq=1,
-        test_rep=params.test_rep,
-        val_interval=params.val_interval
-    )
+    eval_only = getattr(params, "eval_only", False)
+    if eval_only:
+        if not (hasattr(params, "load_checkpoint") and params.load_checkpoint):
+            raise ValueError("eval_only requires load_checkpoint to be set")
+        val_res, test_res = lightning_test(
+            wandb_logger,
+            pred_model,
+            params.datamodule,
+            metrics,
+            model_dir=params.load_checkpoint,
+            strategy=strategy,
+            test_rep=params.test_rep,
+        )
+    else:
+        val_res, test_res = lightning_fit(
+            wandb_logger,
+            pred_model,
+            params.datamodule,
+            metrics,
+            params.num_epochs,
+            strategy=strategy,
+            save_model=True,
+            load_best=params.load_best,
+            reload_freq=1,
+            test_rep=params.test_rep,
+            val_interval=params.val_interval
+        )
 
 
 if __name__ == "__main__":

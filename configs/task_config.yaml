@@ -42,6 +42,10 @@ instagram_mention_language_node:
   <<: *E2E-node
   dataset: instagram_mention_language_node
 
+twitter_retweet_repdem_node:
+  <<: *E2E-node
+  dataset: twitter_retweet_repdem_node
+
 logic_arxiv:
   <<: *E2E-node
   dataset: logic_arxiv
