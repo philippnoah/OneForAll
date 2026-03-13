@@ -8,6 +8,7 @@ import torch_geometric as pyg
 import utils
 from data.KG.gen_data import KGOFADataset
 from data.chemmol.gen_data import MolOFADataset
+from data.midterm.ofa_dataset import MidtermRetweetDataset
 from data.single_graph.gen_data import SingleGraphOFADataset
 from fs_datamanager import SimpleFSManager
 from gp.lightning.data_template import DataWithMeta
@@ -22,7 +23,8 @@ from utils import (binary_apr_func, binary_auc_multi_func, binary_single_auc_fun
 
 name2dataset = {"arxiv": SingleGraphOFADataset, "Cora": SingleGraphOFADataset, "Pubmed": SingleGraphOFADataset,
                 "WN18RR": KGOFADataset, "FB15K237": KGOFADataset, "wikics": SingleGraphOFADataset,
-                "chemblpre": MolOFADataset, "chempcba": MolOFADataset, "chemhiv": MolOFADataset, }
+                "chemblpre": MolOFADataset, "chempcba": MolOFADataset, "chemhiv": MolOFADataset,
+                "midterm_retweet": MidtermRetweetDataset, }
 
 
 ########################################################################
@@ -128,6 +130,20 @@ def KGFSSplitter(dataset):
             data_idx.append(cls_data_idx.numpy())
         fs_split[name] = [np.array(cls_idx), data_idx]
     return fs_split
+
+
+def MidtermSplitter(dataset):
+    y = dataset.data.y
+    labeled = (y >= 0).nonzero(as_tuple=True)[0]
+    perm = labeled[torch.randperm(len(labeled), generator=torch.Generator().manual_seed(42))]
+    n = len(perm)
+    train_end = int(n * 0.70)
+    val_end = int(n * 0.85)
+    return {
+        "train": perm[:train_end].numpy(),
+        "valid": perm[train_end:val_end].numpy(),
+        "test": perm[val_end:].numpy(),
+    }
 
 
 def WikiSplitter(dataset):
